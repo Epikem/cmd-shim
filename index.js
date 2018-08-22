@@ -90,19 +90,28 @@ function writeShim_ (src, to, opts) {
     win32: nodePath,
     posix: shNodePath
   } = normalizePathEnvVar(opts.nodePath)
+
+  const isCrossDrive = from.split(':')[0] != to.split(':')[0]
+  let progBase = '"'
+  let shProgBase = '"'
+  if(isCrossDrive){
+    progBase = '"%~dp0\\'
+    shProgBase = '"$basedir/'
+  }
+
   if (!prog) {
-    prog = `"%~dp0\\${target}"`
-    shProg = `"$basedir/${shTarget}"`
+    prog = `${progBase}${target}"`
+    shProg = `${shProgBase}${shTarget}"`
     pwshProg = shProg
     args = ''
     target = ''
     shTarget = ''
   } else {
-    longProg = `"%~dp0\\${prog}.exe"`
-    shLongProg = '"$basedir/' + prog + '"'
-    pwshLongProg = `"$basedir/${prog}$exe"`
-    target = `"%~dp0\\${target}"`
-    shTarget = `"$basedir/${shTarget}"`
+    longProg = `${progBase}${prog}.exe"`
+    shLongProg = '${shProgBase}' + prog + '"'
+    pwshLongProg = `${shProgBase}${prog}$exe"`
+    target = `${progBase}${target}"`
+    shTarget = `${shProgBase}${shTarget}"`
   }
 
   let cmd
